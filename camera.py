@@ -47,7 +47,9 @@ class Caméra:
             image_en_gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
             res = cv2.matchTemplate(image_en_gris, self.modele, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-            self.frame_roi = [min_loc[1]:max_loc[1], min_loc[0]:max_loc[0]]
+            xMin,yMin= min_loc
+            xMax,yMax = max_loc
+            self.frame_roi = image[yMin:yMax, xMin:xMax]
             touche = cv2.waitKey(33)
             image_roi = cv2.rectangle(image,self.frame_roi[0],self.frame_roi[1],(175,175,175),2) 
             cv2.imshow("Labo 5", image_roi)
