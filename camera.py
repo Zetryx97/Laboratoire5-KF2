@@ -14,7 +14,11 @@ class Caméra:
         self.lit_une_image = True
         self.image_modele = None
         self.mask = cv2.imread("mask-objet.bmp")
-        self.frame_roi = None
+        self.WIDTH_ROI = 25
+        self.HEIGTH_ROI = 25
+        self.last_positionX_found = None
+        self.last_positionY_found = None
+        self.SEUIL_ACCEPTATION = 0.3
         
     def set_resolution_camera(self):
         self.vcap.set(cv2.CAP_PROP_FRAME_WIDTH,320)
@@ -47,12 +51,26 @@ class Caméra:
             image_en_gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) 
             res = cv2.matchTemplate(image_en_gris, self.modele, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-            xMin,yMin= min_loc
             xMax,yMax = max_loc
-            self.frame_roi = image[yMin:yMax, xMin:xMax]
-            touche = cv2.waitKey(33)
-            image_roi = cv2.rectangle(image,self.frame_roi[0],self.frame_roi[1],(175,175,175),2) 
-            cv2.imshow("Labo 5", image_roi)
+            height,width = self.modele.shape[:2]
+            if max_val > self.SEUIL_ACCEPTATION:  
+                self.last_positionX_found = xMax
+                self.last_positionY_found = yMax
+                if self.last_positionX_found == 320 and self.last_positionY_found == 240:
+                    image_roi = cv2.rectangle(image,(self.last_positionX_found + self.WIDTH_ROI,self.last_positionY_found + self.HEIGTH_ROI),(self.last_positionX_found + self.WIDTH_ROI + width,self.last_positionY_found + self.HEIGTH_ROI + height),(0,0,255),2)
+                else:
+                    image_roi = cv2.rectangle(image,(0,0),(320,240),(0,0,255),2)
+                image_objet_trouver = cv2.rectangle(image_roi,(xMax,yMax), (xMax + width, yMax + height),(255,0,0),2)
+                print(xMax,yMax)
+                print(xMax + width, yMax + height)
+                cv2.imshow("Labo 5",image_objet_trouver)
+                touche = cv2.waitKey(33)
+            else:
+                self.last_positionX_found = 320
+                self.last_positionY_found = 240
+                image_roi = cv2.rectangle(image,(0,0),(320,240),(0,0,255),2)
+                cv2.imshow("Labo 5",image_roi)
+                touche = cv2.waitKey(33)
             if touche == ord('q'):
                 self.lit_une_image = False
                 break
