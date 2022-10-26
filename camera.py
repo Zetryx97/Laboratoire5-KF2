@@ -52,7 +52,7 @@ class Caméra:
             res = cv2.matchTemplate(image_en_gris, self.modele, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
             xMax,yMax = max_loc
-            height,width = self.modele.shape[:2]
+            height,width = self.modele.shape[:2] #Get the width / height of the model
             if max_val > self.SEUIL_ACCEPTATION:  
                 self.last_positionX_found = xMax
                 self.last_positionY_found = yMax
